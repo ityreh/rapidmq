@@ -1,0 +1,31 @@
+server:
+  port: 8081
+
+spring:
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:app}
+    password: ${RABBITMQ_PASS:app}
+    virtual-host: ${RABBITMQ_VHOST:/rapidmq}
+
+app:
+  rabbitmq:
+    exchange: rapidmq.exchange
+    routingKey: rapidmq.key
+    queue: rapidmq.queue
+
+management:
+  otlp:
+    metrics:
+      export:
+        url: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4317}
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4317}
+    logging:
+      export:
+        otlp:
+          endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4317}

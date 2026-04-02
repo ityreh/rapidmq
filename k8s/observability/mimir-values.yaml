@@ -1,0 +1,42 @@
+structuredConfig:
+  auth_enabled: false
+
+server:
+  http_listen_port: 9009
+
+minio:
+  enabled: true
+
+memberlist:
+  join_members: []
+
+ruler:
+  enable_api: true
+
+store_gateway:
+  sharding_enabled: false
+
+compactor:
+  sharding_enabled: false
+
+alertmanager:
+  enable_api: true
+
+mimir:
+  structuredConfig:
+    common:
+      storage:
+        backend: s3
+        s3:
+          endpoint: minio:9000
+          bucket_name: mimir
+          access_key_id: minio
+          secret_access_key: minio123
+          insecure: true
+    limits:
+      max_label_names_per_series: 40
+
+singleBinary:
+  replicas: 1
+  persistence:
+    enabled: false

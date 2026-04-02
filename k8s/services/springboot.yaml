@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rapidmq-spring
+  namespace: services
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rapidmq-spring
+  template:
+    metadata:
+      labels:
+        app: rapidmq-spring
+    spec:
+      containers:
+        - name: app
+          image: rapidmq-spring:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          env:
+            - name: RABBITMQ_HOST
+              value: rabbitmq.rabbitmq.svc.cluster.local
+            - name: RABBITMQ_VHOST
+              value: /rapidmq
+            - name: RABBITMQ_USER
+              value: app
+            - name: RABBITMQ_PASS
+              value: app
+            - name: OTEL_SERVICE_NAME
+              value: rapidmq-spring
+            - name: OTEL_EXPORTER_OTLP_ENDPOINT
+              value: http://otel-collector.observability.svc.cluster.local:4317
+            - name: OTEL_TRACES_EXPORTER
+              value: otlp
+            - name: OTEL_METRICS_EXPORTER
+              value: otlp
+            - name: OTEL_LOGS_EXPORTER
+              value: otlp
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rapidmq-spring
+  namespace: services
+spec:
+  type: ClusterIP
+  selector:
+    app: rapidmq-spring
+  ports:
+    - port: 8081
+      targetPort: 8081

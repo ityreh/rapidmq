@@ -1,0 +1,18 @@
+tempo:
+  searchEnabled: true
+  storage:
+    trace:
+      backend: local
+      local:
+        path: /var/tempo
+
+service:
+  type: ClusterIP
+  otlp:
+    grpc:
+      enabled: true
+    http:
+      enabled: true
+
+persistence:
+  enabled: false

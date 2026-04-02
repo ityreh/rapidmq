@@ -1,0 +1,31 @@
+apiVersion: rabbitmq.com/v1beta1
+kind: RabbitmqCluster
+metadata:
+  name: rabbitmq
+  namespace: rabbitmq
+spec:
+  replicas: 1
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 256Mi
+  override:
+    statefulSet:
+      spec:
+        template:
+          spec:
+            securityContext:
+              fsGroup: 999
+            containers:
+              - name: rabbitmq
+                securityContext:
+                  runAsUser: 999
+                  runAsGroup: 999
+                  runAsNonRoot: true
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                      - ALL

@@ -1,0 +1,88 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-user-credentials
+  namespace: rabbitmq
+type: Opaque
+stringData:
+  username: app
+  password: app
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: Vhost
+metadata:
+  name: rapidmq
+  namespace: rabbitmq
+spec:
+  name: /rapidmq
+  rabbitmqClusterReference:
+    name: rabbitmq
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: User
+metadata:
+  name: app
+  namespace: rabbitmq
+spec:
+  tags:
+    - management
+  importCredentialsSecret:
+    name: app-user-credentials
+  rabbitmqClusterReference:
+    name: rabbitmq
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: Permission
+metadata:
+  name: app-rapidmq
+  namespace: rabbitmq
+spec:
+  vhost: /rapidmq
+  user: app
+  permissions:
+    configure: ".*"
+    read: ".*"
+    write: ".*"
+  rabbitmqClusterReference:
+    name: rabbitmq
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: Exchange
+metadata:
+  name: rapidmq-exchange
+  namespace: rabbitmq
+spec:
+  name: rapidmq.exchange
+  vhost: /rapidmq
+  type: direct
+  durable: true
+  autoDelete: false
+  rabbitmqClusterReference:
+    name: rabbitmq
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: Queue
+metadata:
+  name: rapidmq-queue
+  namespace: rabbitmq
+spec:
+  name: rapidmq.queue
+  vhost: /rapidmq
+  durable: true
+  autoDelete: false
+  rabbitmqClusterReference:
+    name: rabbitmq
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: Binding
+metadata:
+  name: rapidmq-binding
+  namespace: rabbitmq
+spec:
+  source: rapidmq.exchange
+  destination: rapidmq.queue
+  destinationType: queue
+  vhost: /rapidmq
+  routingKey: rapidmq.key
+  rabbitmqClusterReference:
+    name: rabbitmq

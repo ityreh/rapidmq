@@ -1,0 +1,27 @@
+deploymentMode: SingleBinary
+
+loki:
+  auth_enabled: false
+  commonConfig:
+    replication_factor: 1
+  useTestSchema: true
+  storage:
+    type: filesystem
+
+singleBinary:
+  replicas: 1
+  persistence:
+    enabled: true
+    size: 2Gi
+
+read:
+  replicas: 0
+
+write:
+  replicas: 0
+
+backend:
+  replicas: 0
+
+minio:
+  enabled: false

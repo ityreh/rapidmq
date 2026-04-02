@@ -15,14 +15,33 @@ datasources:
     datasources:
       - name: Tempo
         type: tempo
+        uid: tempo
         access: proxy
         url: http://tempo.observability.svc.cluster.local:3100
         isDefault: false
+        jsonData:
+          tracesToLogsV2:
+            datasourceUid: loki
+            spanStartTimeShift: "-1m"
+            spanEndTimeShift: "1m"
+            filterByTraceID: true
+            filterBySpanID: false
+            tags:
+              - key: service.name
+                value: service_name
       - name: Loki
         type: loki
+        uid: loki
         access: proxy
         url: http://loki.observability.svc.cluster.local:3100
         isDefault: false
+        jsonData:
+          derivedFields:
+            - datasourceUid: tempo
+              matcherType: label
+              matcherRegex: traceID
+              name: TraceID
+              url: "${__value.raw}"
       - name: Mimir
         type: prometheus
         access: proxy

@@ -7,6 +7,8 @@ loki:
   useTestSchema: true
   storage:
     type: filesystem
+  limits_config:
+    allow_structured_metadata: true
 
 singleBinary:
   replicas: 1

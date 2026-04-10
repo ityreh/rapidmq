@@ -27,7 +27,7 @@ config:
     otlphttp/loki:
       endpoint: http://loki.observability.svc.cluster.local:3100/otlp
     prometheusremotewrite/mimir:
-      endpoint: http://mimir.observability.svc.cluster.local:9009/api/v1/push
+      endpoint: http://mimir-gateway.observability.svc.cluster.local/api/v1/push
   service:
     pipelines:
       traces:

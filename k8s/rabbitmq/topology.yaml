@@ -8,6 +8,16 @@ stringData:
   username: app
   password: app
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-user-credentials
+  namespace: services
+type: Opaque
+stringData:
+  username: app
+  password: app
+---
 apiVersion: rabbitmq.com/v1beta1
 kind: Vhost
 metadata:

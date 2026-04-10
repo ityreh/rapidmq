@@ -2,6 +2,8 @@ server:
   port: 8081
 
 spring:
+  application:
+    name: rapidmq-spring
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
@@ -16,16 +18,24 @@ app:
     queue: rapidmq.queue
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
   otlp:
     metrics:
       export:
-        url: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4317}
+        url: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318}/v1/metrics
   opentelemetry:
     tracing:
       export:
         otlp:
-          endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4317}
+          endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318}/v1/traces
     logging:
       export:
         otlp:
-          endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4317}
+          endpoint: ${OTEL_EXPORTER_OTLP_ENDPOINT:http://localhost:4318}/v1/logs
+
+logging:
+  level:
+    de.ityreh.rapidmq: INFO
+    org.springframework.boot.actuator.autoconfigure.opentelemetry: DEBUG

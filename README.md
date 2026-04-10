@@ -30,6 +30,14 @@ To send a test message:
 curl -X POST http://localhost:8081/publish -H 'content-type: application/json' -d '{"message":"hello"}'
 ```
 
+Redeploy (spring example):
+
+```bash
+eval "$(minikube docker-env)"
+docker build -t rapidmq-spring:local services/springboot
+kubectl rollout restart deployment/rapidmq-spring -n services
+```
+
 ## Sample Flow
 
 - Spring Boot exposes `POST /publish` to send a message.

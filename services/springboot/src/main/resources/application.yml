@@ -38,4 +38,3 @@ management:
 logging:
   level:
     de.ityreh.rapidmq: INFO
-    org.springframework.boot.actuator.autoconfigure.opentelemetry: DEBUG

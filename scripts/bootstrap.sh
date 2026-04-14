@@ -49,6 +49,11 @@ kubectl wait rabbitmqcluster rabbitmq -n rabbitmq \
 
 kubectl apply -f "$ROOT_DIR/k8s/rabbitmq/topology.yaml"
 
+kubectl wait rabbitmquser app -n rabbitmq \
+  --for=condition=Ready --timeout=5m
+kubectl wait rabbitmqpermission app-rapidmq -n rabbitmq \
+  --for=condition=Ready --timeout=5m
+
 helm upgrade --install mimir grafana/mimir-distributed \
   -n observability -f "$ROOT_DIR/k8s/observability/mimir-values.yaml"
 

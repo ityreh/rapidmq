@@ -1,6 +1,7 @@
 package de.ityreh.rapidmq.telemetry;
 
 import java.util.List;
+import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.observation.OpenTelemetryServerRequestObservationConvention;
@@ -11,6 +12,8 @@ import io.micrometer.core.instrument.binder.jvm.convention.otel.OpenTelemetryJvm
 import io.micrometer.core.instrument.binder.jvm.convention.otel.OpenTelemetryJvmMemoryMeterConventions;
 import io.micrometer.core.instrument.binder.jvm.convention.otel.OpenTelemetryJvmThreadMeterConventions;
 import io.micrometer.core.instrument.binder.system.ProcessorMetrics;
+import io.opentelemetry.api.OpenTelemetry;
+import io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender;
 
 @Configuration(proxyBeanMethods = false)
 public class OpenTelemetryConfiguration {
@@ -41,5 +44,10 @@ public class OpenTelemetryConfiguration {
     JvmThreadMetrics jvmThreadMetrics() {
         return new JvmThreadMetrics(List.of(),
                 new OpenTelemetryJvmThreadMeterConventions(Tags.empty()));
+    }
+
+    @Bean
+    ApplicationRunner installOpenTelemetryLogBridge(OpenTelemetry openTelemetry) {
+        return args -> OpenTelemetryAppender.install(openTelemetry);
     }
 }

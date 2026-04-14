@@ -5,6 +5,8 @@ tempo:
       backend: local
       local:
         path: /var/tempo
+  microservices:
+    enabled: true
 
 service:
   type: ClusterIP

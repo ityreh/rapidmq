@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Spring Boot default console/file appenders -->
+    <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+    <!-- OTel log bridge: forwards SLF4J logs into the OTel SDK → OTLP exporter -->
+    <appender name="OpenTelemetry"
+              class="io.opentelemetry.instrumentation.logback.appender.v1_0.OpenTelemetryAppender">
+        <!-- Include MDC key-value pairs as OTel log attributes -->
+        <captureKeyValuePairAttributes>true</captureKeyValuePairAttributes>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="OpenTelemetry"/>
+    </root>
+</configuration>

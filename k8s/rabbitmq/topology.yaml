@@ -96,3 +96,30 @@ spec:
   routingKey: rapidmq.key
   rabbitmqClusterReference:
     name: rabbitmq
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: Queue
+metadata:
+  name: rapidmq-queue-node
+  namespace: rabbitmq
+spec:
+  name: rapidmq.queue.node
+  vhost: /rapidmq
+  durable: true
+  autoDelete: false
+  rabbitmqClusterReference:
+    name: rabbitmq
+---
+apiVersion: rabbitmq.com/v1beta1
+kind: Binding
+metadata:
+  name: rapidmq-binding-node
+  namespace: rabbitmq
+spec:
+  source: rapidmq.exchange
+  destination: rapidmq.queue.node
+  destinationType: queue
+  vhost: /rapidmq
+  routingKey: rapidmq.node
+  rabbitmqClusterReference:
+    name: rabbitmq

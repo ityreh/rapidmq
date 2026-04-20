@@ -34,6 +34,8 @@ spec:
                 secretKeyRef:
                   name: app-user-credentials
                   key: password
+            - name: OTEL_SERVICE_NAME
+              value: rapidmq-spring
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
               value: http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4318
 ---

@@ -22,6 +22,12 @@ const {
 const {
   PeriodicExportingMetricReader,
 } = require("@opentelemetry/sdk-metrics");
+const {
+  HttpInstrumentation,
+} = require("@opentelemetry/instrumentation-http");
+const {
+  ExpressInstrumentation,
+} = require("@opentelemetry/instrumentation-express");
 
 const RABBITMQ_HOST = process.env.RABBITMQ_HOST || "localhost";
 const RABBITMQ_PORT = process.env.RABBITMQ_PORT || "5672";
@@ -30,8 +36,11 @@ const RABBITMQ_PASS = process.env.RABBITMQ_PASS || "app";
 const RABBITMQ_VHOST = process.env.RABBITMQ_VHOST || "/rapidmq";
 
 const EXCHANGE = "rapidmq.exchange";
-const ROUTING_KEY = "rapidmq.key";
-const QUEUE = "rapidmq.queue";
+// Node consumes from its own queue bound to "rapidmq.node" routing key
+const QUEUE = process.env.RABBITMQ_QUEUE || "rapidmq.queue.node";
+const CONSUME_ROUTING_KEY = process.env.RABBITMQ_CONSUME_ROUTING_KEY || "rapidmq.node";
+// Node's /publish endpoint sends to the main queue to trigger the full chain
+const PUBLISH_ROUTING_KEY = process.env.RABBITMQ_PUBLISH_ROUTING_KEY || "rapidmq.key";
 
 const OTEL_ENDPOINT = process.env.OTEL_EXPORTER_OTLP_ENDPOINT || "http://localhost:4317";
 const SERVICE_NAME = process.env.OTEL_SERVICE_NAME || "rapidmq-node";
@@ -58,12 +67,17 @@ const sdk = new NodeSDK({
   traceExporter,
   metricReader,
   logRecordProcessor: logProcessor,
+  instrumentations: [
+    new HttpInstrumentation(),
+    new ExpressInstrumentation(),
+  ],
 });
-
-const logger = logs.getLogger("rapidmq-node");
 
 async function start() {
   await sdk.start();
+  // Logger must be obtained after sdk.start() — calling logs.getLogger() before
+  // start() captures the noop LoggerProvider and never exports anything.
+  const logger = logs.getLogger("rapidmq-node");
 
   const encodedVhost = encodeURIComponent(RABBITMQ_VHOST);
   const amqpUrl = `amqp://${RABBITMQ_USER}:${RABBITMQ_PASS}@${RABBITMQ_HOST}:${RABBITMQ_PORT}/${encodedVhost}`;
@@ -72,7 +86,7 @@ async function start() {
 
   await channel.assertExchange(EXCHANGE, "direct", { durable: true });
   await channel.assertQueue(QUEUE, { durable: true });
-  await channel.bindQueue(QUEUE, EXCHANGE, ROUTING_KEY);
+  await channel.bindQueue(QUEUE, EXCHANGE, CONSUME_ROUTING_KEY);
 
   channel.consume(QUEUE, (msg) => {
     if (!msg) return;
@@ -105,7 +119,7 @@ async function start() {
       const headers = {};
       propagation.inject(context.active(), headers);
 
-      channel.publish(EXCHANGE, ROUTING_KEY, Buffer.from(message), {
+      channel.publish(EXCHANGE, PUBLISH_ROUTING_KEY, Buffer.from(message), {
         headers,
       });
 

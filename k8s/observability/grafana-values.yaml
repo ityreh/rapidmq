@@ -29,6 +29,13 @@ datasources:
             tags:
               - key: service.name
                 value: service_name
+          tracesToMetrics:
+            datasourceUid: mimir
+            tags:
+              - key: service.name
+                value: service_name
+          nodeGraph:
+            enabled: true
       - name: Loki
         type: loki
         uid: loki
@@ -39,11 +46,16 @@ datasources:
           derivedFields:
             - datasourceUid: tempo
               matcherType: label
-              matcherRegex: traceID
+              matcherRegex: trace_id
               name: TraceID
               url: "${__value.raw}"
       - name: Mimir
         type: prometheus
+        uid: mimir
         access: proxy
         url: http://mimir-gateway.observability.svc.cluster.local/prometheus
         isDefault: true
+        jsonData:
+          exemplarTraceIdDestinations:
+            - name: trace_id
+              datasourceUid: tempo

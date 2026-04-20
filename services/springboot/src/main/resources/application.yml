@@ -15,7 +15,6 @@ app:
   rabbitmq:
     exchange: rapidmq.exchange
     routingKey: rapidmq.key
-    queue: rapidmq.queue
 
 management:
   tracing:

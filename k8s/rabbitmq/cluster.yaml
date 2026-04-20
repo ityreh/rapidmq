@@ -5,13 +5,19 @@ metadata:
   namespace: rabbitmq
 spec:
   replicas: 1
+  persistence:
+    storage: 10Gi
+    storageClassName: standard
   resources:
     requests:
       cpu: 100m
-      memory: 256Mi
+      memory: 512Mi
     limits:
       cpu: 500m
-      memory: 256Mi
+      memory: 512Mi
+  rabbitmq:
+    additionalPlugins:
+      - rabbitmq_management
   override:
     statefulSet:
       spec:

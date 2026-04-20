@@ -69,6 +69,12 @@ helm upgrade --install grafana grafana/grafana \
 helm upgrade --install otel-collector open-telemetry/opentelemetry-collector \
   -n observability -f "$ROOT_DIR/k8s/observability/otel-collector-values.yaml"
 
+kubectl rollout status deployment otel-collector-opentelemetry-collector \
+  -n observability --timeout=5m
+
+# Build service images into Minikube's Docker daemon
+"$ROOT_DIR/scripts/build-images.sh"
+
 kubectl apply -f "$ROOT_DIR/k8s/services/springboot.yaml"
 kubectl apply -f "$ROOT_DIR/k8s/services/python.yaml"
 kubectl apply -f "$ROOT_DIR/k8s/services/node.yaml"

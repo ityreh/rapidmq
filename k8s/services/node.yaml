@@ -25,13 +25,25 @@ spec:
             - name: RABBITMQ_VHOST
               value: /rapidmq
             - name: RABBITMQ_USER
-              value: app
+              valueFrom:
+                secretKeyRef:
+                  name: app-user-credentials
+                  key: username
             - name: RABBITMQ_PASS
-              value: app
+              valueFrom:
+                secretKeyRef:
+                  name: app-user-credentials
+                  key: password
+            - name: RABBITMQ_QUEUE
+              value: rapidmq.queue.node
+            - name: RABBITMQ_CONSUME_ROUTING_KEY
+              value: rapidmq.node
+            - name: RABBITMQ_PUBLISH_ROUTING_KEY
+              value: rapidmq.key
             - name: OTEL_SERVICE_NAME
               value: rapidmq-node
             - name: OTEL_EXPORTER_OTLP_ENDPOINT
-              value: http://otel-collector.observability.svc.cluster.local:4317
+              value: http://otel-collector-opentelemetry-collector.observability.svc.cluster.local:4317
             - name: OTEL_TRACES_EXPORTER
               value: otlp
             - name: OTEL_METRICS_EXPORTER

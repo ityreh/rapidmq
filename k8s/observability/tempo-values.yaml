@@ -5,8 +5,27 @@ tempo:
       backend: local
       local:
         path: /var/tempo
-  microservices:
+
+  metricsGenerator:
     enabled: true
+    remoteWriteUrl: "http://mimir-gateway.observability.svc.cluster.local/api/v1/push"
+    processor:
+      service_graphs: {}
+      span_metrics: {}
+      local_blocks:
+        flush_to_storage: true
+    storage:
+      path: /var/tempo/generator/wal
+    traces_storage:
+      path: /var/tempo/generator/traces
+
+  overrides:
+    defaults:
+      metrics_generator:
+        processors:
+          - service-graphs
+          - span-metrics
+          - local-blocks
 
 service:
   type: ClusterIP
